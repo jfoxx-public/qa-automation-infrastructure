@@ -1,0 +1,13 @@
+# Exclude unnecessary files from Docker build context
+node_modules/
+.git/
+.gitignore
+README.md
+notes.md
+infrastructure/
+infrastructure.backup/
+playwright-report/
+test-results/
+.DS_Store
+*.log
+.env*
