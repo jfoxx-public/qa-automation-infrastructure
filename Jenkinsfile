@@ -23,6 +23,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                deleteDir()
                 git branch: "${params.BRANCH}",
                     url: 'https://github.com/jfoxx-public/playwright-web-test-framework-demo.git'
             }
