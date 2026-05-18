@@ -1,0 +1,62 @@
+#
+# Jenkins Configuration as Code
+#
+jenkins:
+  systemMessage: "Jenkins CI for Playwright"
+
+  numExecutors: 2
+
+  mode: NORMAL
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin123"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"
+
+jobs:
+  - script: >
+      pipelineJob('playwright-tests') {
+
+        parameters {
+
+          choiceParam(
+            'BRANCH',
+            ['main', 'automation-specs'],
+            'Git branch to test'
+          )
+
+          choiceParam(
+            'ENV',
+            ['staging', 'dev'],
+            'Target environment'
+          )
+        }
+
+        definition {
+          cpsScm {
+
+            scm {
+              git {
+
+                remote {
+                  url('https://github.com/jfoxx-public/playwright-web-test-framework-demo.git')
+                }
+
+                branch('main')
+              }
+            }
+
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }

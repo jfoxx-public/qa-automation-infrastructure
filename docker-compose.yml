@@ -1,0 +1,47 @@
+services:
+  # STAGING environment (Port 3000)
+  saucedemo-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: staging-app
+    ports:
+      - "3000:80"
+    networks:
+      - qa-network
+
+  # DEV environment (Port 3001)
+  saucedemo-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dev-app
+    ports:
+      - "3001:80"
+    networks:
+      - qa-network
+
+  # JENKINS server (Port 8080)
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins-ci
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - qa-network
+
+networks:
+  qa-network:
+    name: qa-automation-network
+    driver: bridge
+
+volumes:
+  jenkins_home:
