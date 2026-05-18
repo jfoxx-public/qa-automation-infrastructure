@@ -18,7 +18,7 @@ pipeline {
     environment {
         ENV = "${params.ENV}"
         // Points to the service names defined in the internal docker-compose file
-        BASE_URL = "${params.ENV == 'staging' ? 'http://api-staging:3000' : 'http://api-dev:3000'}"
+        BASE_URL = "${params.ENV == 'staging' ? 'http://staging-api:3000' : 'http://dev-api:3000'}"
     }
 
     stages {
