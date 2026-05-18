@@ -1,5 +1,5 @@
 services:
-  # STAGING environment (Port 3000)
+  # === WEB APPLICATIONS ===
   saucedemo-staging:
     build:
       context: .
@@ -10,7 +10,6 @@ services:
     networks:
       - qa-network
 
-  # DEV environment (Port 3001)
   saucedemo-dev:
     build:
       context: .
@@ -21,7 +20,28 @@ services:
     networks:
       - qa-network
 
-  # JENKINS server (Port 8080)
+  # === API APPLICATIONS ===
+  api-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: staging-api
+    ports:
+      - "4000:3000"
+    networks:
+      - qa-network
+
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: dev-api
+    ports:
+      - "4001:3000"
+    networks:
+      - qa-network
+
+  # === JENKINS SERVER ===
   jenkins:
     build:
       context: .

@@ -1,0 +1,14 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install a tool to spin up an instant mock REST API
+RUN npm install -g json-server
+
+# Create a sample database so the API has available endpoints
+RUN echo '{"users": [{"id": 1, "name": "QA User"}], "posts": [{"id": 1, "title": "Infrastructure Test"}], "status": {"health": "ok"}}' > db.json
+
+EXPOSE 3000
+
+# Start the mock API on port 3000
+CMD ["json-server", "--watch", "db.json", "--host", "0.0.0.0", "--port", "3000"]

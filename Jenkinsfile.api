@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(
+            name: 'BRANCH',
+            choices: ['main'],
+            description: 'Git branch of the API test framework to run'
+        )
+
+        choice(
+            name: 'ENV',
+            choices: ['staging', 'dev'],
+            description: 'Target environment'
+        )
+    }
+
+    environment {
+        ENV = "${params.ENV}"
+        // Points to the service names defined in the internal docker-compose file
+        BASE_URL = "${params.ENV == 'staging' ? 'http://api-staging:3000' : 'http://api-dev:3000'}"
+    }
+
+    stages {
+        stage('Checkout API Test Framework') {
+            steps {
+                deleteDir() // Cleans the workspace from infrastructure files
+                
+                git branch: "${params.BRANCH}",
+                    url: 'https://github.com/jfoxx-public/playwright-api-test-framework-demo.git'
+            }
+        }
+
+        stage('Run Playwright API Tests') {
+            steps {
+                script {
+                    docker.image('mcr.microsoft.com/playwright:v1.59.1-noble')
+                        .inside('--ipc=host --network qa-automation-network') {
+                        sh '''
+                            echo "Environment: $ENV"
+                            echo "Target API URL: $BASE_URL"
+                            node -v
+                            npm -v
+                            npm ci
+                            BASE_URL=$BASE_URL npx playwright test
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright API Report'
+            ])
+
+            cleanWs()
+        }
+    }
+}
