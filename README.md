@@ -1,1 +1,1 @@
-# qa-automation-infrastricture
+# qa-automation-infrastructure
