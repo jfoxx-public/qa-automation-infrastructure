@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile.api
     container_name: staging-api
     ports:
-      - "4000:3000"
+      - "4000:3002"
     networks:
       - qa-network
 
@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile.api
     container_name: dev-api
     ports:
-      - "4001:3000"
+      - "4001:3003"
     networks:
       - qa-network
 
