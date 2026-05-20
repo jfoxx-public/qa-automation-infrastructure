@@ -1,0 +1,47 @@
+FROM jenkins/jenkins:lts
+
+USER root
+
+# --------------------------------------------------
+# System dependencies
+# --------------------------------------------------
+RUN apt-get update && apt-get install -y \
+    docker.io \
+    git \
+    curl \
+    wget \
+    unzip \
+    ca-certificates \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# --------------------------------------------------
+# Jenkins plugins
+# --------------------------------------------------
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+
+RUN jenkins-plugin-cli \
+    --plugin-file /usr/share/jenkins/ref/plugins.txt
+
+# --------------------------------------------------
+# Disable Jenkins setup wizard and configure security
+# --------------------------------------------------
+ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false -Dhudson.model.DirectoryBrowserSupport.CSP=''"
+ENV JENKINS_OPTS="--argumentsRealm.passwd.admin=admin123 --argumentsRealm.roles.admin=admin"
+
+COPY init.groovy.d/jenkins.install.UpgradeWizard.state /usr/share/jenkins/ref/jenkins.install.UpgradeWizard.state
+COPY init.groovy.d/jenkins.install.InstallUtil.lastExecVersion /usr/share/jenkins/ref/jenkins.install.InstallUtil.lastExecVersion
+
+# --------------------------------------------------
+# Create a new Pipeline job
+# --------------------------------------------------
+ENV CASC_JENKINS_CONFIG=/var/jenkins_home/casc.yaml
+
+COPY jenkins/casc.yaml /var/jenkins_home/casc.yaml
+
+# --------------------------------------------------
+# Optional sanity checks
+# --------------------------------------------------
+RUN chown -R jenkins:jenkins /var/jenkins_home
+
+USER jenkins

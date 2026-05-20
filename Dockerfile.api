@@ -1,0 +1,21 @@
+# Use a multi-stage or simple approach to fetch only the application directory
+FROM alpine/git AS repo-fetcher
+WORKDIR /src
+RUN git clone https://github.com/jfoxx-public/playwright-api-test-framework-demo.git .
+
+# Build the runtime container using the native api-service setup
+FROM node:18-alpine
+WORKDIR /app
+
+# Copy ONLY the target API application files from the cloned repository
+COPY --from=repo-fetcher /src/resources/api-service /app
+
+RUN sed -i "s/'localhost'/process.env.HOST || '0.0.0.0'/g" app.js && \
+    sed -i 's/"localhost"/process.env.HOST || "0.0.0.0"/g' app.js
+
+RUN npm install
+
+EXPOSE 4000
+EXPOSE 4001
+
+CMD ["node", "app.js"]

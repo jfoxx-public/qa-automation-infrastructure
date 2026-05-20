@@ -1,0 +1,77 @@
+services:
+  # === WEB APPLICATIONS ===
+  staging-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: staging-web
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    networks:
+      - qa-network
+      
+  dev-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dev-web
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    networks:
+      - qa-network
+
+  # === API APPLICATIONS ===
+  staging-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: staging-api
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - HOST=0.0.0.0
+    networks:
+      - qa-network
+
+  dev-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: dev-api
+    ports:
+      - "4001:4001"
+    environment:
+      - PORT=4001
+      - HOST=0.0.0.0
+    networks:
+      - qa-network
+
+  # === JENKINS SERVER ===
+  jenkins-ci:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins-ci
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - qa-network
+
+networks:
+  qa-network:
+    name: qa-automation-network
+    driver: bridge
+
+volumes:
+  jenkins_home:

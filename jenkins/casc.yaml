@@ -1,0 +1,61 @@
+#
+# Jenkins Configuration as Code
+#
+jenkins:
+  systemMessage: "Jenkins CI for Multi-Project Automation Frameworks"
+  numExecutors: 2
+  mode: NORMAL
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin123"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"
+
+jobs:
+  # JOB 1: Web Automation Tests
+  - script: >
+      pipelineJob('playwright-web-tests') {
+        parameters {
+          choiceParam('BRANCH', ['main', 'automation-specs'], 'Git branch of the WEB framework')
+          choiceParam('ENV', ['staging', 'dev'], 'Target environment')
+        }
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/jfoxx-public/qa-automation-infrastructure.git') }
+                branch('feature/initial-infrastructure-setup')
+              }
+            }
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }
+
+  # JOB 2: API Automation Tests
+  - script: >
+      pipelineJob('playwright-api-tests') {
+        parameters {
+          choiceParam('BRANCH', ['main'], 'Git branch of the API framework')
+          choiceParam('ENV', ['staging', 'dev'], 'Target environment')
+        }
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/jfoxx-public/qa-automation-infrastructure.git') }
+                branch('feature/initial-infrastructure-setup')
+              }
+            }
+            scriptPath('Jenkinsfile.api')
+          }
+        }
+      }
