@@ -16,7 +16,7 @@ pipeline {
     }
 
     environment {
-        BASE_URL = "${params.ENV == 'staging' ? 'http://staging-app' : 'http://dev-app'}"
+        BASE_URL = "${params.ENV == 'staging' ? 'http://staging-web:3000' : 'http://dev-web:3001'}"
     }
 
     stages {

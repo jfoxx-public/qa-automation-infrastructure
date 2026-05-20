@@ -1,48 +1,58 @@
 services:
   # === WEB APPLICATIONS ===
-  saucedemo-staging:
+  staging-web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: staging-app
+    container_name: staging-web
     ports:
-      - "3000:80"
+      - "3000:3000"
+    environment:
+      - PORT=3000
     networks:
       - qa-network
-
-  saucedemo-dev:
+      
+  dev-web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dev-app
+    container_name: dev-web
     ports:
-      - "3001:80"
+      - "3001:3001"
+    environment:
+      - PORT=3001
     networks:
       - qa-network
 
   # === API APPLICATIONS ===
-  api-staging:
+  staging-api:
     build:
       context: .
       dockerfile: Dockerfile.api
     container_name: staging-api
     ports:
-      - "4000:3002"
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - HOST=0.0.0.0
     networks:
       - qa-network
 
-  api-dev:
+  dev-api:
     build:
       context: .
       dockerfile: Dockerfile.api
     container_name: dev-api
     ports:
-      - "4001:3003"
+      - "4001:4001"
+    environment:
+      - PORT=4001
+      - HOST=0.0.0.0
     networks:
       - qa-network
 
   # === JENKINS SERVER ===
-  jenkins:
+  jenkins-ci:
     build:
       context: .
       dockerfile: Dockerfile.jenkins
